@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="RButtonY">
+        <!--        外圆margin-->
+        <attr name="rby_circle_out_margin" format="dimension|reference" />
+        <!--        外圆画笔宽度-->
+        <attr name="rby_circle_width" format="dimension|reference" />
+        <!--        外圆画笔颜色-->
+        <attr name="rby_circle_paint_color" format="color" />
+        <!--        内方形初始边长相对于外圆内切正方形边长比率 0-1 -->
+        <attr name="rby_rect_rate_start" format="float" />
+        <!--        内方形结束边长相对于初始边长比率 0-1-->
+        <attr name="rby_rect_rate_fnish" format="float" />
+        <!--        内方形画笔颜色-->
+        <attr name="rby_rect_paint_color" format="color" />
+        <!--        录制最短时间-->
+        <attr name="rby_short_time" format="integer" />
+        <!--        录制最长时间-->
+        <attr name="rby_long_time" format="integer" />
+    </declare-styleable>
+</resources>
