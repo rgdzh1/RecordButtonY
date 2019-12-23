@@ -12,10 +12,11 @@
         android:layout_height="50dp"
         android:layout_centerInParent="true"
         app:rby_circle_out_margin="5dp"
-
+        app:rby_circle_paint_color="@color/colorPrimary"
         app:rby_circle_width="1dp"
         app:rby_long_time="18"
         app:rby_short_time="8"
+        app:rby_rect_paint_color="@color/colorPrimaryDark"
         app:rby_rect_rate_fnish="0.8"
         app:rby_rect_rate_start="0.8" />
 
