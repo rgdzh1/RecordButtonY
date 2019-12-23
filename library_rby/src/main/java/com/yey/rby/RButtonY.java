@@ -82,6 +82,7 @@ public class RButtonY extends View {
         initPaint();
         initRect();
         initListener();
+
     }
 
     /**
@@ -91,10 +92,10 @@ public class RButtonY extends View {
         TypedArray typedArray = context.obtainStyledAttributes(attrs, R.styleable.RButtonY, defStyleAttr, 0);
         mCircleOutMarginSize = typedArray.getDimensionPixelSize(R.styleable.RButtonY_rby_circle_out_margin, 5);
         mCircleWidth = typedArray.getDimensionPixelSize(R.styleable.RButtonY_rby_circle_width, 5);
-        mCirclePaintColor = typedArray.getColor(R.styleable.RButtonY_rby_circle_paint_color, getResources().getColor(R.color.orange));
+        mCirclePaintColor = typedArray.getColor(R.styleable.RButtonY_rby_circle_paint_color, getResources().getColor(R.color.rby_orange));
         mRectRateStart = typedArray.getFloat(R.styleable.RButtonY_rby_rect_rate_start, 0.9f);
         mRectRateFinish = typedArray.getFloat(R.styleable.RButtonY_rby_rect_rate_fnish, 0.5f);
-        mRectPaintColor = typedArray.getColor(R.styleable.RButtonY_rby_rect_paint_color, getResources().getColor(R.color.read));
+        mRectPaintColor = typedArray.getColor(R.styleable.RButtonY_rby_rect_paint_color, getResources().getColor(R.color.rby_read));
         mShortest = typedArray.getInteger(R.styleable.RButtonY_rby_short_time, 3);
         mLongest = typedArray.getInteger(R.styleable.RButtonY_rby_long_time, 10);
         typedArray.recycle();
@@ -125,6 +126,7 @@ public class RButtonY extends View {
     @Override
     protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
         super.onLayout(changed, left, top, right, bottom);
+
         int width = getWidth();
         int height = getHeight();
         //圆心坐标
@@ -147,7 +149,7 @@ public class RButtonY extends View {
         if (mTempRectSize == 0) {
             mTempRectSize = mRectStartSize;
         }
-//        Log.e(TAG, "onLayout");
+        Log.e(TAG, "onLayout");
     }
 
 
@@ -156,20 +158,16 @@ public class RButtonY extends View {
         super.onDraw(canvas);
         //画圆圈
         canvas.drawCircle(centerX, centerY, radius, mCirclePaint);
-
-
         //正方形四点坐标
         int mLeftRectTemp = (int) (centerX - mTempRectSize / 2);
         int mRightRectTemp = (int) (centerX + mTempRectSize / 2);
         int mTopRectTemp = (int) (centerY + mTempRectSize / 2);
         int mButtonRectTemp = (int) (centerY - mTempRectSize / 2);
-
-
         //画正方形
         mRectF.set(mLeftRectTemp, mTopRectTemp, mRightRectTemp, mButtonRectTemp);
         //(float) Math.sqrt(radius): 圆角半径
         canvas.drawRoundRect(mRectF, (float) Math.sqrt(radius), (float) Math.sqrt(radius), mRectPaint);
-//        Log.e(TAG, "onDraw");
+         Log.e(TAG, "onDraw");
     }
 
     private void initListener() {
