@@ -35,7 +35,7 @@ public class RButtonY extends View {
     private int mRectStartSize;
     private int mRectEndSize;
     private float mTempRectSize;
-    private boolean up;
+    private boolean up;//按钮是否开始记录, true 为开始, false 还没开始
     private boolean isAnimRuning;
     private int mShortest;//最短时长
     private int mLongest;//最长时长
@@ -60,7 +60,7 @@ public class RButtonY extends View {
             }
             Message obtain = Message.obtain();
             obtain.obj = "RButtonY";
-            mHandler.sendMessageDelayed(obtain,1000);
+            mHandler.sendMessageDelayed(obtain, 1000);
 //            mHandler.sendEmptyMessageDelayed(0, 1000);//每一秒钟+1
             if (mCurrent >= mLongest) {//当前记录时间大于或等于最大记录时间，将自动结束记录
                 recordFinish();
@@ -219,7 +219,7 @@ public class RButtonY extends View {
                 if (up && mCurrent >= mShortest) { //当前记录时间大于或者等于最短记录时间，可手动结束
                     recordFinish();
                 }
-                if (up && mCurrent < mShortest){//当前录制时长小于规定的最小录制时间时候,用户点击按钮回调该方法
+                if (up && mCurrent < mShortest && mCurrent >= 1) {//当前录制时长小于规定的最小录制时间时候,用户点击按钮回调该方法
                     if (rbyCb != null) {
                         rbyCb.lessShortTimeRecode(String.valueOf(mCurrent));
                     }
