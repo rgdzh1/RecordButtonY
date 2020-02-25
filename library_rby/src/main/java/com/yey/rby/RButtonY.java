@@ -50,14 +50,18 @@ public class RButtonY extends View {
         @Override
         public void handleMessage(@NonNull Message msg) {
             super.handleMessage(msg);
+            if (msg.obj != "RButtonY") return;
             mCurrent++;
             if (BuildConfig.DEBUG) {
-//                Log.e(TAG, "倒计时" + mCurrent);
+                Log.e(TAG, "倒计时" + mCurrent);
             }
             if (rbyCb != null) {
                 rbyCb.eventCb(String.valueOf(mCurrent));
             }
-            mHandler.sendEmptyMessageDelayed(0, 1000);//每一秒钟+1
+            Message obtain = Message.obtain();
+            obtain.obj = "RButtonY";
+            mHandler.sendMessageDelayed(obtain,1000);
+//            mHandler.sendEmptyMessageDelayed(0, 1000);//每一秒钟+1
             if (mCurrent >= mLongest) {//当前记录时间大于或等于最大记录时间，将自动结束记录
                 recordFinish();
             }
@@ -94,7 +98,7 @@ public class RButtonY extends View {
         mCircleOutMarginSize = typedArray.getDimensionPixelSize(R.styleable.RButtonY_rby_circle_out_margin, 5);
         mCircleWidth = typedArray.getDimensionPixelSize(R.styleable.RButtonY_rby_circle_width, 5);
         mCirclePaintColor = typedArray.getColor(R.styleable.RButtonY_rby_circle_paint_color, Color.YELLOW);
-        mRectPaintColor = typedArray.getColor(R.styleable.RButtonY_rby_rect_paint_color,  Color.RED);
+        mRectPaintColor = typedArray.getColor(R.styleable.RButtonY_rby_rect_paint_color, Color.RED);
         mRectRateStart = typedArray.getFloat(R.styleable.RButtonY_rby_rect_rate_start, 0.9f);
         mRectRateFinish = typedArray.getFloat(R.styleable.RButtonY_rby_rect_rate_fnish, 0.5f);
         mShortest = typedArray.getInteger(R.styleable.RButtonY_rby_short_time, 3);
@@ -111,7 +115,7 @@ public class RButtonY extends View {
         mCirclePaint.setAntiAlias(true);
         mCirclePaint.setColor(mCirclePaintColor);
         mCirclePaint.setStyle(Paint.Style.STROKE);
-        mCirclePaint.setStrokeWidth(DensityUtil.dip2px(mContext, mCircleWidth));
+        mCirclePaint.setStrokeWidth(mCircleWidth);
 
         //内部正方形画笔
         mRectPaint = new Paint();
@@ -138,7 +142,7 @@ public class RButtonY extends View {
         if (centerX != centerY) {
             radius = Math.min(centerX, centerY);
         }
-        radius = radius - DensityUtil.dip2px(mContext, mCircleOutMarginSize) / 2;
+        radius = radius - mCircleOutMarginSize / 2;
 
         //正方形开始边长
         //pow 平方，sqrt 开方
@@ -168,7 +172,7 @@ public class RButtonY extends View {
         mRectF.set(mLeftRectTemp, mTopRectTemp, mRightRectTemp, mButtonRectTemp);
         //(float) Math.sqrt(radius): 圆角半径
         canvas.drawRoundRect(mRectF, (float) Math.sqrt(radius), (float) Math.sqrt(radius), mRectPaint);
-         Log.e(TAG, "onDraw");
+        Log.e(TAG, "onDraw");
     }
 
     private void initListener() {
@@ -215,6 +219,11 @@ public class RButtonY extends View {
                 if (up && mCurrent >= mShortest) { //当前记录时间大于或者等于最短记录时间，可手动结束
                     recordFinish();
                 }
+                if (up && mCurrent < mShortest){//当前录制时长小于规定的最小录制时间时候,用户点击按钮回调该方法
+                    if (rbyCb != null) {
+                        rbyCb.lessShortTimeRecode(String.valueOf(mCurrent));
+                    }
+                }
                 break;
         }
         return true;//消费事件
@@ -239,7 +248,11 @@ public class RButtonY extends View {
         if (rbyCb != null) {
             rbyCb.startCb(String.valueOf(mCurrent));//结束时回调
         }
-        mHandler.sendEmptyMessage(1);//开始计时
+        //开始计时
+        Message obtain = Message.obtain();
+        obtain.obj = "RButtonY";
+        mHandler.sendMessage(obtain);
+//        mHandler.sendEmptyMessage(0);//开始计时
         up = true;
         mTempRectSize = mRectEndSize;
     }
@@ -290,7 +303,11 @@ public class RButtonY extends View {
             mTempRectSize = bundle.getFloat("rect_size");
             up = bundle.getBoolean("up");
             mCurrent = bundle.getInt("mCurrent");
-            mHandler.sendEmptyMessage(1);//开始计时
+            //开始计时
+            Message obtain = Message.obtain();
+            obtain.obj = "RButtonY";
+            mHandler.sendMessage(obtain);
+//            mHandler.sendEmptyMessage(0);//开始计时
             super.onRestoreInstanceState(bundle.getParcelable("instance"));
             return;
         }
