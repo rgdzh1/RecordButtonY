@@ -21,14 +21,17 @@ public class MainActivity extends AppCompatActivity {
             public void startCb(String current) {
                 Toast.makeText(MainActivity.this, "录制开始" + current, Toast.LENGTH_SHORT).show();
             }
+
             @Override
             public void finishCb(String current) {
                 Toast.makeText(MainActivity.this, "录制结束" + current, Toast.LENGTH_SHORT).show();
             }
+
             @Override
             public void eventCb(String current) {
                 Log.e(TAG, "当前录制时间" + current);
             }
+
             @Override
             public void lessShortTimeRecode(String current) {
                 Log.e(TAG, "当前录制时间小于规定最短录制时间回调");

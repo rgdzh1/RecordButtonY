@@ -1,2 +1,2 @@
 include ':app', ':library_rby'
-rootProject.name='RecordButtonY'
+rootProject.name = 'RecordButtonY'

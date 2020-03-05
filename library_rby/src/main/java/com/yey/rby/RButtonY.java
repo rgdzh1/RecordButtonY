@@ -135,8 +135,9 @@ public class RButtonY extends View {
         //正方形结束边长
         mRectEndSize = (int) (mRectStartSize * mRectRateFinish);
         //mTempRectSize == 0 时, 即第一创建该View.
-        //如果屏幕旋转,mTempRectSize 将在onRestoreInstanceState方法中重新赋值,此时mTempRectSize不为0,为屏幕旋转之前的值.
         if (mTempRectSize == 0) {
+            //如果屏幕旋转,onLayout将被回调,此时并不希望mTempRectSize被重新赋值为mRectStartSize(开始状态).
+            //所以只有当第一次创建时,才需要为mTempRectSize赋值为mRectStartSize(开始状态)
             mTempRectSize = mRectStartSize;
         }
     }
@@ -145,14 +146,14 @@ public class RButtonY extends View {
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
-        //画圆圈
+        //外圆绘制
         canvas.drawCircle(centerX, centerY, radius, mCirclePaint);
         //正方形四点坐标
         int mLeftRectTemp = (int) (centerX - mTempRectSize / 2);
         int mRightRectTemp = (int) (centerX + mTempRectSize / 2);
         int mTopRectTemp = (int) (centerY + mTempRectSize / 2);
         int mButtonRectTemp = (int) (centerY - mTempRectSize / 2);
-        //画正方形
+        //绘制正方形
         mRectF.set(mLeftRectTemp, mTopRectTemp, mRightRectTemp, mButtonRectTemp);
         //(float) Math.sqrt(radius): 圆角半径
         canvas.drawRoundRect(mRectF, (float) Math.sqrt(radius), (float) Math.sqrt(radius), mRectPaint);
@@ -187,12 +188,12 @@ public class RButtonY extends View {
         mAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
             @Override
             public void onAnimationUpdate(ValueAnimator animation) {
+                //动态获取正方形边长
                 mTempRectSize = (float) animation.getAnimatedValue();
                 invalidate();//重绘
             }
         });
     }
-
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
