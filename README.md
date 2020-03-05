@@ -1,5 +1,6 @@
 ## RecordButtonY
 > 视频录制按钮, 可以设置最短录制时间和最长录制时间.
+> 如果对实现源码感兴趣可以看看我写的[博客](https://blog.csdn.net/MoLiao2046/article/details/104688172)
 ### 使用
 - 在项目根目录build.gradle中配置repositories
     ```groovy
