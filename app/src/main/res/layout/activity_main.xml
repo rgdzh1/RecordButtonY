@@ -14,8 +14,8 @@
         app:rby_circle_out_margin="5dp"
         app:rby_circle_paint_color="@color/colorPrimary"
         app:rby_circle_width="1dp"
-        app:rby_long_time="25"
-        app:rby_short_time="8"
+        app:rby_long_time="8"
+        app:rby_short_time="4"
         app:rby_rect_paint_color="@color/colorPrimaryDark"
         app:rby_rect_rate_fnish="0.8"
         app:rby_rect_rate_start="0.8" />

@@ -43,7 +43,7 @@ group = "com.yey.rby"
 //libName(库的名字)
 def libName = "RecordButtonY"
 //version(版本号)
-version = "0.1.5"
+version = "0.1.6"
 //生成源文件
 task sourcesJar(type: Jar) {
     from android.sourceSets.main.java.srcDirs
