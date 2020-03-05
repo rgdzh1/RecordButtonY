@@ -42,7 +42,6 @@ public class RButtonY extends View {
     private int mCurrent;//当前时间
     private RBYCallback rbyCb;
     private int mCircleOutMarginSize;//外圆margin
-    private Context mContext;
     private float mRectRateStart;//内方形初始边长相对于外圆内切正方形边长比率
     private float mRectRateFinish;//内方形结束边长相对于初始边长的比率
     @SuppressLint("HandlerLeak")
@@ -50,20 +49,14 @@ public class RButtonY extends View {
         @Override
         public void handleMessage(@NonNull Message msg) {
             super.handleMessage(msg);
-            if (msg.obj != "RButtonY") return;
             mCurrent++;
-            if (BuildConfig.DEBUG) {
-                Log.e(TAG, "倒计时" + mCurrent);
-            }
             if (rbyCb != null) {
                 rbyCb.eventCb(String.valueOf(mCurrent));
             }
-            Message obtain = Message.obtain();
-            obtain.obj = "RButtonY";
-            mHandler.sendMessageDelayed(obtain, 1000);
-//            mHandler.sendEmptyMessageDelayed(0, 1000);//每一秒钟+1
             if (mCurrent >= mLongest) {//当前记录时间大于或等于最大记录时间，将自动结束记录
                 recordFinish();
+            } else {
+                mHandler.sendEmptyMessageDelayed(0, 1000);
             }
         }
     };
@@ -82,12 +75,10 @@ public class RButtonY extends View {
 
     public RButtonY(Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
-        mContext = context;
         initParame(context, attrs, defStyleAttr);
         initPaint();
         initRect();
-        initListener();
-
+        initAnimator();
     }
 
     /**
@@ -106,9 +97,9 @@ public class RButtonY extends View {
         typedArray.recycle();
     }
 
-    //    Paint.Style.FILL设置只绘制图形内容
-    //    Paint.Style.STROKE设置只绘制图形的边
-    //    Paint.Style.FILL_AND_STROKE设置都绘制
+    // Paint.Style.FILL设置只绘制图形内容
+    // Paint.Style.STROKE设置只绘制图形的边
+    // Paint.Style.FILL_AND_STROKE设置都绘制
     private void initPaint() {
         //外圆画笔
         mCirclePaint = new Paint();
@@ -116,7 +107,6 @@ public class RButtonY extends View {
         mCirclePaint.setColor(mCirclePaintColor);
         mCirclePaint.setStyle(Paint.Style.STROKE);
         mCirclePaint.setStrokeWidth(mCircleWidth);
-
         //内部正方形画笔
         mRectPaint = new Paint();
         mRectPaint.setAntiAlias(true);
@@ -124,6 +114,7 @@ public class RButtonY extends View {
         mRectPaint.setStyle(Paint.Style.FILL_AND_STROKE);
     }
 
+    //初始化内方形RectF
     private void initRect() {
         mRectF = new RectF();
     }
@@ -131,21 +122,15 @@ public class RButtonY extends View {
     @Override
     protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
         super.onLayout(changed, left, top, right, bottom);
-
         int width = getWidth();
         int height = getHeight();
         //圆心坐标
         centerX = width / 2;
         centerY = height / 2;
         //半径
-        radius = centerX;
-        if (centerX != centerY) {
-            radius = Math.min(centerX, centerY);
-        }
-        radius = radius - mCircleOutMarginSize / 2;
-
-        //正方形开始边长
+        radius = Math.min(centerX, centerY) - mCircleOutMarginSize / 2;
         //pow 平方，sqrt 开方
+        //正方形开始边长,圆形直径的平方除以二再开放,为正方形边长.
         mRectStartSize = (int) (Math.sqrt(Math.pow(radius * 2, 2) / 2) * mRectRateStart);
         //正方形结束边长
         mRectEndSize = (int) (mRectStartSize * mRectRateFinish);
@@ -154,7 +139,6 @@ public class RButtonY extends View {
         if (mTempRectSize == 0) {
             mTempRectSize = mRectStartSize;
         }
-        Log.e(TAG, "onLayout");
     }
 
 
@@ -172,10 +156,13 @@ public class RButtonY extends View {
         mRectF.set(mLeftRectTemp, mTopRectTemp, mRightRectTemp, mButtonRectTemp);
         //(float) Math.sqrt(radius): 圆角半径
         canvas.drawRoundRect(mRectF, (float) Math.sqrt(radius), (float) Math.sqrt(radius), mRectPaint);
-        Log.e(TAG, "onDraw");
     }
 
-    private void initListener() {
+    /**
+     * 初始化动画
+     * 这里对动画进行监听, 获取正方形边长随动画改变的值,然后重绘
+     */
+    private void initAnimator() {
         mAnimator = new ValueAnimator();
         /**
          * onAnimationStart() - 当动画开始的时候调用.
@@ -196,7 +183,7 @@ public class RButtonY extends View {
                 isAnimRuning = true;
             }
         });
-        //动画进度监听
+        //动画进度监听,获取正方形随动画变化的边长,然后重绘
         mAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
             @Override
             public void onAnimationUpdate(ValueAnimator animation) {
@@ -211,15 +198,19 @@ public class RButtonY extends View {
     public boolean onTouchEvent(MotionEvent event) {
         switch (event.getAction()) {
             case MotionEvent.ACTION_UP:
-//                Log.e(TAG, "查看isRuning" + isAnimRuning);
-                if (isAnimRuning) return true;//如果动画正在播放，拒绝点击
-                if (!up && mCurrent == 0) { //开始时，当前记录时间为0
+                //如果正方形动画正在播放，就拒绝按钮点击
+                if (isAnimRuning) return true;
+                //up为false代表未开始记录,true 代表开始记录
+                //未开始记录时,mCurrent是等于0
+                if (!up && mCurrent == 0) {
                     recordStart();
                 }
-                if (up && mCurrent >= mShortest) { //当前记录时间大于或者等于最短记录时间，可手动结束
+                //已开始记录,并且当前录制时间大于或者等于所设置的最短记录时长,则按钮可以手动结束
+                if (up && mCurrent >= mShortest) {
                     recordFinish();
                 }
-                if (up && mCurrent < mShortest && mCurrent >= 1) {//当前录制时长小于规定的最小录制时间时候,用户点击按钮回调该方法
+                //已开始记录,当前录制时间小于所设置的最短记录时长,并且录制时间大于1,则回调方法通知当前还不能手动结束录制
+                if (up && mCurrent < mShortest && mCurrent >= 1) {
                     if (rbyCb != null) {
                         rbyCb.lessShortTimeRecode(String.valueOf(mCurrent));
                     }
@@ -237,42 +228,51 @@ public class RButtonY extends View {
     }
 
     /**
-     * 记录开始
+     * 录制开始
      */
     private void recordStart() {
-        //方形缩小 开始
-        mAnimator.setFloatValues(mRectStartSize, mRectEndSize);
-        mAnimator.setDuration(100);
-        mAnimator.setInterpolator(new LinearInterpolator());
-        mAnimator.start();
+        //正方形开始动画
+        startAnimation(mRectStartSize, mRectEndSize);
         if (rbyCb != null) {
-            rbyCb.startCb(String.valueOf(mCurrent));//结束时回调
+            //录制开始的回调
+            rbyCb.startCb(String.valueOf(mCurrent));
         }
         //开始计时
-        Message obtain = Message.obtain();
-        obtain.obj = "RButtonY";
-        mHandler.sendMessage(obtain);
-//        mHandler.sendEmptyMessage(0);//开始计时
+        mHandler.sendEmptyMessage(0);
+        //录制标识为开始
         up = true;
         mTempRectSize = mRectEndSize;
     }
 
     /**
-     * 记录结束
+     * 录制结束
      */
     private void recordFinish() {
-        //方形放大 结束
-        mAnimator.setFloatValues(mRectEndSize, mRectStartSize);
+        //正方形结束动画
+        startAnimation(mRectEndSize, mRectStartSize);
+        if (rbyCb != null) {
+            //结束时回调
+            rbyCb.finishCb(String.valueOf(mCurrent));
+        }
+        //录制结束,当前时间归0
+        mCurrent = 0;
+        mHandler.removeCallbacksAndMessages(null);
+        //录制标识为结束
+        up = false;
+        mTempRectSize = mRectStartSize;
+    }
+
+    /**
+     * 开始动画
+     *
+     * @param startValue
+     * @param endValue
+     */
+    private void startAnimation(float startValue, float endValue) {
+        mAnimator.setFloatValues(startValue, endValue);
         mAnimator.setDuration(100);
         mAnimator.setInterpolator(new LinearInterpolator());
         mAnimator.start();
-        if (rbyCb != null) {
-            rbyCb.finishCb(String.valueOf(mCurrent));//结束时回调
-        }
-        mCurrent = 0;//记录时间置为0
-        up = false;
-        mTempRectSize = mRectStartSize;
-        mHandler.removeCallbacksAndMessages(null);
     }
 
     //屏幕旋转时候保存必要的数据
@@ -298,22 +298,19 @@ public class RButtonY extends View {
     protected void onRestoreInstanceState(Parcelable state) {
         //判断state的类型是否为bundle,若是则从bundle中取数据
         if (state instanceof Bundle) {
-            Log.e(TAG, "onRestoreInstanceState");
             Bundle bundle = (Bundle) state;
             mTempRectSize = bundle.getFloat("rect_size");
             up = bundle.getBoolean("up");
             mCurrent = bundle.getInt("mCurrent");
             //开始计时
-            Message obtain = Message.obtain();
-            obtain.obj = "RButtonY";
-            mHandler.sendMessage(obtain);
-//            mHandler.sendEmptyMessage(0);//开始计时
+            mHandler.sendEmptyMessage(0);
             super.onRestoreInstanceState(bundle.getParcelable("instance"));
             return;
         }
         super.onRestoreInstanceState(state);
     }
 
+    //页面销毁,清空消息,防止内存泄漏
     @Override
     protected void onDetachedFromWindow() {
         super.onDetachedFromWindow();
