@@ -9,7 +9,7 @@ android {
         minSdkVersion 15
         targetSdkVersion 29
         versionCode 1
-        versionName "1.0"
+        versionName "0.1.7"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles 'consumer-rules.pro'
@@ -35,44 +35,6 @@ dependencies {
     androidTestImplementation 'androidx.test.ext:junit:1.1.1'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
 }
-apply plugin: 'com.github.dcendents.android-maven'
-apply plugin: 'com.jfrog.bintray'
-//compile 'group:libName:version'
-//group(组名字)
-group = "com.yey.rby"
-//libName(库的名字)
-def libName = "RecordButtonY"
-//version(版本号)
-version = "0.1.6"
-//生成源文件
-task sourcesJar(type: Jar) {
-    from android.sourceSets.main.java.srcDirs
-    classifier = 'sources'
-}
-//上传到jCenter所需要的源码文件
-artifacts {
-    archives sourcesJar
-}
-//上传到JCenter
-Properties properties = new Properties()
-properties.load(project.rootProject.file('local.properties').newDataInputStream())
-bintray {
-    //读取 local.properties 文件里面的 bintray.user
-    user = properties.getProperty("bintray.user")
-    //读取 local.properties 文件里面的 bintray.apikey
-    key = properties.getProperty("bintray.apikey")
-    configurations = ['archives']
-    pkg {
-        //所创建的Maven类型仓库的名称
-        repo = 'Yey'
-        //库的名字
-        name = libName
-        //项目描述
-        desc = '录制按钮'
-        licenses = ["Apache-2.0"]
-        publish = true
-
-    }
-}
-
-
+//必须放这里,不然提示这个错误
+//Caused by: java.lang.NullPointerException: android.compileSdkVersion is missing!
+apply from: "bintrayUpload.gradle"

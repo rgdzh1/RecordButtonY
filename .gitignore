@@ -63,3 +63,7 @@ fastlane/Preview.html
 fastlane/screenshots
 fastlane/test_output
 fastlane/readme.md
+
+#jcenter上传删除有用信息
+bintray.properties
+
