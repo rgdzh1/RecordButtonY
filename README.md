@@ -1,10 +1,11 @@
 ## RecordButtonY
+[![](https://jitpack.io/v/rgdzh1/RecordButtonY.svg)](https://jitpack.io/#rgdzh1/RecordButtonY)
 > 视频录制按钮, 可以设置最短录制时间和最长录制时间.
 > 如果对实现源码感兴趣可以看看我写的[博客](https://blog.csdn.net/MoLiao2046/article/details/104688172)
 ### 使用   
 - 配置依赖, 在所在Module的build.gradle文件下
   ```groovy
-  implementation 'com.yey.rby:library_rby:0.1.7'
+  implementation 'com.github.rgdzh1:RecordButtonY:Tag'
   ```
   
 - 属性释意
